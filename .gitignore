@@ -1,0 +1,4 @@
+# installs and live state, not source of truth
+/bin/
+/tools/
+/coordination/
