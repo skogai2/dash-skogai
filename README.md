@@ -9,8 +9,11 @@ setgid so everything inherits the group.
 | Path            | Tracked | Purpose |
 |-----------------|---------|---------|
 | `admin/`        | yes     | setup/maintenance scripts. Several run via sudo, so only the owner may write here (`755`) |
-| `bin/`          | no      | shared executables for agents (`gptme-coordination`) |
-| `tools/`        | no      | venvs backing `bin/` |
+| `bin/`          | no      | generated launchers for gptme core and every gptme-contrib package (incl. `gptme-coordination`) |
+| `tools/`        | no      | shared runtimes (`tools/mise`: uv, python) backing `bin/` |
+| `gptme-contrib/`| yes     | submodule: `skogai2/gptme-contrib` fork, pinned to the tag `scripts/gen-bin.py` installs from |
+| `scripts/`      | yes     | `gen-bin.py` generates `bin/`; pins live at its top |
+| `mise.toml`     | yes     | runtimes (uv, python) and `bin/` on PATH |
 | `coordination/` | no      | live `gptme-coordination` SQLite DB (`coord.db`, must stay `0664`) |
 
 ## Bootstrap a machine
@@ -18,12 +21,22 @@ setgid so everything inherits the group.
 ```bash
 sudo bash admin/create-agents.sh [names...]   # group + agent users (default: claude dot amy goose)
 sudo bash admin/setup-coordination.sh         # /skogai perms, coordination dir, 0664 DB
-bash admin/install-coordination.sh            # shared gptme-coordination install
+bash admin/install-tools.sh                   # shared runtimes + bin/ launchers (replaces install-coordination.sh)
 sudo bash admin/test-coordination.sh          # cross-user smoke test
 export COORDINATION_DB=/skogai/coordination/coord.db PATH=/skogai/bin:$PATH
 ```
 
+`install-tools.sh` works from any checkout path, so a container can clone this
+repo anywhere, run it, and add `<clone>/bin` to PATH (or use `mise.toml`'s
+`_.path` from a workspace). Packages install on first run via
+`uv tool run --from <pinned git spec>`, cached per user. To bump: tag a commit on
+the fork, update `CONTRIB_REF`/the submodule, rerun `install-tools.sh`.
+
 ## Gotchas
+
+- mise's `pipx:` backend drops `#subdirectory=` and installs the repo root, so
+  packages come from uv, not `[tools]`.
+- Packages that depend on `mcp` get `mcp<2` (mcp 2.x removed `FastMCP`).
 
 - SQLite creates DBs as `0644`; umask/ACLs cannot add group-write. The DB is
   pre-created `0664` by `setup-coordination.sh`; `-wal`/`-shm` inherit its mode.

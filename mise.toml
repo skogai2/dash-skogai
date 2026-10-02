@@ -1,0 +1,10 @@
+# Runtimes for the shared workspace. Packages (gptme + gptme-contrib) are not
+# listed: the launchers in bin/ install them on first run via uv. Build with
+# admin/install-tools.sh; pins live in scripts/gen-bin.py.
+
+[tools]
+uv = "latest"
+python = "latest"
+
+[env]
+_.path = ["{{config_root}}/bin"]
