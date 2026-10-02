@@ -11,12 +11,16 @@ command -v mise >/dev/null || { echo "mise not found (https://mise.run)" >&2; ex
 git -C "$ROOT" submodule update --init gptme-contrib
 
 mkdir -p "$ROOT/tools" "$ROOT/bin"
-chmod 2775 "$ROOT/tools" "$ROOT/bin" 2>/dev/null || true
+# 755, not group-writable: bin/ launchers are executed by every user of this
+# install (human and agents), so a group-writable bin/ would let any agent plant
+# code that runs as another user. Only this admin script writes here.
+chmod 755 "$ROOT/tools" "$ROOT/bin" 2>/dev/null || true
 
 export MISE_DATA_DIR="$ROOT/tools/mise"
 mise trust -q "$ROOT/mise.toml"
 mise -C "$ROOT" install uv python  # named: don't pull in system-config tools
 "$(mise -C "$ROOT" which python)" "$ROOT/scripts/gen-bin.py"
 
-chmod -R g+rX,o+rX "$ROOT/tools" "$ROOT/bin"
+# also drop any group/other write left over from older installs (previously 2775)
+chmod -R g+rX,o+rX,go-w "$ROOT/tools" "$ROOT/bin"
 "$ROOT/bin/gptme-coordination" --help >/dev/null && echo "installed under $ROOT"

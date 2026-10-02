@@ -6,7 +6,7 @@ Each launcher resolves uv through mise, then runs the tool with
 `uv tool run --from <pinned spec>`. mise's pipx backend drops `#subdirectory=`
 fragments, so uv does the package install and mise only provides the runtimes.
 
-The pins live here (CONTRIB_URL/CONTRIB_REF/GPTME_SPEC) and nowhere else.
+The pins live here (CONTRIB_URL/CONTRIB_TAG/CONTRIB_REF/GPTME_SPEC) and nowhere else.
 Re-run after bumping a pin or after the contrib submodule gains a package:
 
     python3 scripts/gen-bin.py
@@ -21,7 +21,13 @@ PACKAGES = ROOT / "gptme-contrib" / "packages"
 BIN = ROOT / "bin"
 
 CONTRIB_URL = "git+https://github.com/skogai2/gptme-contrib.git"
-CONTRIB_REF = "skogai-2026.10.02"
+CONTRIB_TAG = "skogai-2026.10.02"  # human-readable label only; never installed from
+# The launchers must install from the full commit SHA, not the tag: for a tag or
+# branch `uv tool run --from` re-fetches the ref on every call (measured ~20 s per
+# invocation, and `--offline` fails), while a SHA hits uv's cache (~0.1 s, works
+# offline). Keep this equal to what CONTRIB_TAG points at (and the submodule):
+#   git ls-remote https://github.com/skogai2/gptme-contrib.git 'refs/tags/<tag>^{}'
+CONTRIB_REF = "959333e436c71a81be42946f97b2f184aadad044"
 GPTME_SPEC = "gptme[server,acp]==0.34.0"
 
 # gptme core's console scripts (from `pip show -f gptme` at GPTME_SPEC).
@@ -44,6 +50,11 @@ ROOT="$(cd "$(dirname "$(readlink -f "${{BASH_SOURCE[0]}}")")/.." && pwd)"
 [ -d "$ROOT/tools/mise" ] && export MISE_DATA_DIR="${{MISE_DATA_DIR:-$ROOT/tools/mise}}"
 export MISE_TRUSTED_CONFIG_PATHS="$ROOT${{MISE_TRUSTED_CONFIG_PATHS:+:$MISE_TRUSTED_CONFIG_PATHS}}"
 UV="$(mise -C "$ROOT" which uv 2>/dev/null)" || UV=uv
+# One coordination DB for everyone using this install. Without this,
+# gptme-coordination (and gptodo --skip-claimed) resolve the DB from the git root
+# of the cwd, so each repo/worktree gets its own DB and agents silently stop
+# seeing each other's claims. Set COORDINATION_DB to override.
+export COORDINATION_DB="${{COORDINATION_DB:-$ROOT/coordination/coord.db}}"
 exec "$UV" tool run --from "{spec}"{withs} {cmd} "$@"
 """
 

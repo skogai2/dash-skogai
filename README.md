@@ -23,14 +23,17 @@ sudo bash admin/create-agents.sh [names...]   # group + agent users (default: cl
 sudo bash admin/setup-coordination.sh         # /skogai perms, coordination dir, 0664 DB
 bash admin/install-tools.sh                   # shared runtimes + bin/ launchers (replaces install-coordination.sh)
 sudo bash admin/test-coordination.sh          # cross-user smoke test
-export COORDINATION_DB=/skogai/coordination/coord.db PATH=/skogai/bin:$PATH
+export PATH=/skogai/bin:$PATH   # launchers default COORDINATION_DB to /skogai/coordination/coord.db
 ```
 
 `install-tools.sh` works from any checkout path, so a container can clone this
 repo anywhere, run it, and add `<clone>/bin` to PATH (or use `mise.toml`'s
 `_.path` from a workspace). Packages install on first run via
 `uv tool run --from <pinned git spec>`, cached per user. To bump: tag a commit on
-the fork, update `CONTRIB_REF`/the submodule, rerun `install-tools.sh`.
+the fork, then set `CONTRIB_TAG` (label) and `CONTRIB_REF` (the tag's full commit SHA) and
+the submodule to match, and rerun `install-tools.sh`. The launchers install from the SHA,
+not the tag: uv re-fetches tags on every call (~20 s, no offline use), SHAs are cached.
+`COORDINATION_DB` defaults to `<install>/coordination/coord.db` in every launcher.
 
 ## Gotchas
 
