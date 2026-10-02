@@ -35,6 +35,35 @@ the submodule to match, and rerun `install-tools.sh`. The launchers install from
 not the tag: uv re-fetches tags on every call (~20 s, no offline use), SHAs are cached.
 `COORDINATION_DB` defaults to `<install>/coordination/coord.db` in every launcher.
 
+## First run and hooks
+
+The first call of each launcher builds its package into the calling user's uv
+cache (~12 s for a small package, longer for heavy ones); later calls take
+~0.2 s and work offline. Warm the launchers that run inside time-limited hooks
+once after installing, as each user that will run them:
+
+```bash
+/skogai/bin/gptme-cc-memory-prompt-submit </dev/null >/dev/null   # UserPromptSubmit hook has a 10 s timeout
+/skogai/bin/gptme-cc-memory-stop-hook </dev/null >/dev/null
+```
+
+Claude Code hooks should prefer the shared launcher and fall back to a
+user-level install, e.g. in the wrapper script a hook calls:
+
+```bash
+bin="${SKOGAI_BIN:-/skogai/bin}/gptme-cc-memory-prompt-submit"
+[[ -x "$bin" ]] || bin="$(command -v gptme-cc-memory-prompt-submit || true)"
+[[ -n "$bin" ]] && exec "$bin"
+exit 0   # degrade gracefully: a hook must never block a prompt
+```
+
+## Permissions
+
+| Path            | Mode   | Why |
+|-----------------|--------|-----|
+| `bin/`, `tools/`| `755`  | launchers run as every user; group-write would let one agent plant code that runs as another. Only `install-tools.sh` writes here |
+| `coordination/` | `2775` | every agent must create/write `coord.db` and its `-wal`/`-shm` files |
+
 ## Gotchas
 
 - mise's `pipx:` backend drops `#subdirectory=` and installs the repo root, so
