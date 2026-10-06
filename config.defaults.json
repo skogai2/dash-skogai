@@ -1,11 +1,11 @@
 {
   "files": [
     {
-      "source": "fish/config.fish",
+      "source": "mise.toml",
       "install": {
-        "env": "SKOGAI_CONFIG_FISH_DIR",
-        "xdg": "fish",
-        "default": "~/.config/fish"
+        "env": "SKOGAI_CONFIG_EXAMPLE_DIR",
+        "xdg": "example",
+        "default": "~/.config/example"
       }
     }
   ]
