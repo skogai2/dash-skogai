@@ -1,5 +1,12 @@
 {
   "files": [
-    { "source": "fish/config.fish" }
+    {
+      "source": "fish/config.fish",
+      "install": {
+        "env": "SKOGAI_CONFIG_FISH_DIR",
+        "xdg": "fish",
+        "default": "~/.config/fish"
+      }
+    }
   ]
 }
