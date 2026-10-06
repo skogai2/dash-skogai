@@ -15,6 +15,7 @@ setgid so everything inherits the group.
 | `scripts/`      | yes     | `gen-bin.py` generates `bin/`; pins live at its top |
 | `mise.toml`     | yes     | runtimes (uv, python) and `bin/` on PATH |
 | `coordination/` | no      | live `gptme-coordination` SQLite DB (`coord.db`, must stay `0664`) |
+| `fish/`         | yes     | shared fish config (`config.fish`), the source every repo's fish config is installed from. Environment variables are not here: they come from atuin dotfiles vars |
 
 ## Bootstrap a machine
 
