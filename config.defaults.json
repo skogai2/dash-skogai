@@ -1,6 +1,14 @@
 {
   "files": [
     {
+      "source": "test.txt",
+      "install": {
+        "env": "SKOGAI_CONFIG_EXAMPLE_DIR",
+        "xdg": "example",
+        "default": "~/.config/example"
+      }
+    },
+    {
       "source": "mise.toml",
       "install": {
         "env": "SKOGAI_CONFIG_EXAMPLE_DIR",
