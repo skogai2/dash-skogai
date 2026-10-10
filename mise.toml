@@ -5,6 +5,7 @@
 [tools]
 uv = "latest"
 python = "latest"
+"github:openknowledge-sh/openknowledge" = { version = "latest", exe = "openknowledge" }
 
 [env]
 _.path = ["{{config_root}}/bin"]
