@@ -8,6 +8,7 @@ setgid so everything inherits the group.
 
 | Path            | Tracked | Purpose |
 |-----------------|---------|---------|
+| `knowledge/`    | yes     | global knowledge (OKF bundle): the shared [glossary](knowledge/glossary.md) and [`.skogai/` layout](knowledge/layout.md); start at [knowledge/index.md](knowledge/index.md) |
 | `admin/`        | yes     | setup/maintenance scripts. Several run via sudo, so only the owner may write here (`755`) |
 | `bin/`          | no      | generated launchers for gptme core and every gptme-contrib package (incl. `gptme-coordination`) |
 | `tools/`        | no      | shared runtimes (`tools/mise`: uv, python) backing `bin/` |
