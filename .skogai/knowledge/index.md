@@ -7,7 +7,7 @@ okf_bundle_purpose: "Global skogai knowledge: the shared vocabulary and the .sko
 # dash-skogai Knowledge
 
 Global knowledge for skogai. dash-skogai is installed as `/skogai`, so this
-bundle is `/skogai/knowledge/`. What is shared between skogai repos and
+bundle is `/skogai/.skogai/knowledge/`. What is shared between skogai repos and
 agents is defined here; every `.skogai/` is an instance of it.
 
 Global knowledge carries no `stale_after`. An entry marked **to be defined**
