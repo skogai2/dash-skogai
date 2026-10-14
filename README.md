@@ -63,7 +63,7 @@ exit 0   # degrade gracefully: a hook must never block a prompt
 
 | Path            | Mode   | Why |
 |-----------------|--------|-----|
-| `bin/`, `tools/`| `755`  | launchers run as every user; group-write would let one agent plant code that runs as another. Only `install-tools.sh` writes here |
+| `bin/`, `tools/`| `2755` | launchers run as every user; group-write would let one agent plant code that runs as another. Only `install-tools.sh` writes here |
 | `coordination/` | `2775` | every agent must create/write `coord.db` and its `-wal`/`-shm` files |
 
 ## Gotchas
