@@ -9,3 +9,28 @@ python = "latest"
 
 [env]
 _.path = ["{{config_root}}/bin"]
+# who: CLAUDECODE=1 in everything Claude Code spawns (Bash tool, hooks, MCP servers, IDE terminals)
+SKOGAI_USER = "{% if env.CLAUDECODE is defined %}claude{% else %}skogix{% endif %}"
+# mode: CLAUDE_CODE_REMOTE is "true" in cloud sessions and never set locally
+SKOGAI_MODE = "{% if env.CLAUDE_CODE_REMOTE is defined and env.CLAUDE_CODE_REMOTE == 'true' %}remote{% else %}workstation{% endif %}"
+
+# claude gets only its own profile; the human gets both, stacked
+FNOX_PROFILE = "{% if env.CLAUDECODE is defined %}claude{% else %}skogix,claude{% endif %}"
+
+# no `profile =` here, so mise uses FNOX_PROFILE from above
+[secrets.fnox]
+
+[tasks.claude-only]
+description = "Needs a secret that only exists for claude"
+secrets = ["MY_SECRET_LOCAL_CLAUDE_ONLY"]
+run = 'echo "CLAUDE_ONLY=$MY_SECRET_LOCAL_CLAUDE_ONLY"'
+
+[tasks.skogix-only]
+description = "Needs a secret that only exists in the skogix profile"
+secrets = ["MY_SECRET_LOCAL_SKOGIX_ONLY"]
+run = 'echo "SKOGIX_ONLY=$MY_SECRET_LOCAL_SKOGIX_ONLY"'
+
+[tasks.shared]
+description = "Needs a secret that is shared between both"
+secrets = ["OUR_SHARED_LOCAL_SECRET"]
+run = 'echo "SHARED=$OUR_SHARED_LOCAL_SECRET"'
