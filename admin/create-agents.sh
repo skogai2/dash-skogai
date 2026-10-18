@@ -7,7 +7,7 @@
 set -euo pipefail
 [ "$(id -u)" -eq 0 ] || { echo "run as root (sudo)" >&2; exit 1; }
 
-HUMANS=(skogix)                       # add aldervall here if that user exists
+HUMANS=(skogix aldervall)                       # add aldervall here if that user exists
 AGENTS=("$@"); [ ${#AGENTS[@]} -gt 0 ] || AGENTS=(claude dot amy goose codex)
 
 getent group skogai >/dev/null || { groupadd --system skogai; echo "created group skogai"; }
